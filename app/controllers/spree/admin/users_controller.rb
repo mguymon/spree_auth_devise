@@ -21,7 +21,7 @@ module Spree
           roles = params[:user].delete("spree_role_ids")
         end
 
-        @user = Spree::User.new(user_params)
+        @user = Spree.user_class.new(user_params)
         if @user.save
 
           if roles
@@ -47,7 +47,7 @@ module Spree
 
           if params[:user][:password].present?
             # this logic needed b/c devise wants to log us out after password changes
-            user = Spree::User.reset_password_by_token(params[:user])
+            user = Spree.user_class.reset_password_by_token(params[:user])
             sign_in(@user, :event => :authentication, :bypass => !Spree::Auth::Config[:signout_after_password_change])
           end
           flash.now[:success] = Spree.t(:account_updated)
@@ -78,7 +78,7 @@ module Spree
           if request.xhr? && params[:q].present?
             #disabling proper nested include here due to rails 3.1 bug
             #@collection = User.includes(:bill_address => [:state, :country], :ship_address => [:state, :country]).
-            @collection = Spree::User.includes(:bill_address, :ship_address)
+            @collection = Spree.user_class.includes(:bill_address, :ship_address)
                               .where("spree_users.email #{LIKE} :search
                                      OR (spree_addresses.firstname #{LIKE} :search AND spree_addresses.id = spree_users.bill_address_id)
                                      OR (spree_addresses.lastname  #{LIKE} :search AND spree_addresses.id = spree_users.bill_address_id)
@@ -87,7 +87,7 @@ module Spree
                                     { :search => "#{params[:q].strip}%" })
                               .limit(params[:limit] || 100)
           else
-            @search = Spree::User.registered.ransack(params[:q])
+            @search = Spree.user_class.registered.ransack(params[:q])
             @collection = @search.result.page(params[:page]).per(Spree::Config[:admin_products_per_page])
           end
         end
