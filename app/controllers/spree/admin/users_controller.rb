@@ -73,6 +73,10 @@ module Spree
 
       protected
 
+        def model_class
+          Spree.user_class
+        end
+
         def collection
           return @collection if @collection.present?
           if request.xhr? && params[:q].present?
