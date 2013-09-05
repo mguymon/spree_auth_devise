@@ -11,7 +11,7 @@ class Spree::UsersController < Spree::StoreController
   end
 
   def create
-    @user = Spree::User.new(user_params)
+    @user = Spree.user_class.new(user_params)
     if @user.save
 
       if current_order
